@@ -1,1 +1,29 @@
+name: Update Fuel Prices
 
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update fuel.json
+        run: |
+          echo '{
+            "petrol": 272.15,
+            "diesel": 284.35,
+            "updated": "'$(date +%F)'"
+          }' > fuel.json
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add fuel.json
+          git diff --cached --quiet || git commit -m "Update fuel price"
+          git push
